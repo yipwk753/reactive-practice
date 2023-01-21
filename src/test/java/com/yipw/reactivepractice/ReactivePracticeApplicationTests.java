@@ -70,6 +70,62 @@ class ReactivePracticeApplicationTests {
 	}
 
 	@Test
+	void testStringFluxCollectList() {
+		Flux<String> fluxString = Flux.just("A", "B", "C");
+		StepVerifier.create(fluxString.collectList()).expectNext(Arrays.asList("A", "B", "C")).verifyComplete();
+	}
+
+	@Test
+	void testStringFluxCollectListMap() {
+		Flux<String> fluxString = Flux.just("A", "B", "C");
+		StepVerifier.create(fluxString.collectList().map((List<String> list) -> {
+			list.replaceAll((value) -> {
+				return value.toLowerCase();
+			});
+			return list;
+		})).expectNext(Arrays.asList("a", "b", "c")).verifyComplete();
+	}
+
+	@Test
+	void testStringFluxCollectListFlatMap() {
+		Flux<String> fluxString = Flux.just("A", "B", "C");
+		StepVerifier.create(fluxString.collectList().flatMap((List<String> list) -> {
+			list.replaceAll((value) -> {
+				return value.toLowerCase();
+			});
+			return Mono.just(list);
+		})).expectNext(Arrays.asList("a", "b", "c")).verifyComplete();
+	}
+
+	@Test
+	void testStringFluxCollectListFlatMapIterable() {
+		Flux<String> fluxString = Flux.just("A", "B", "C");
+		StepVerifier.create(fluxString.collectList().flatMapIterable((List<String> list) -> {
+			list.replaceAll((value) -> {
+				return value.toLowerCase();
+			});
+			return list;
+		})).expectNext("a").expectNext("b").expectNext("c").verifyComplete();
+	}
+
+	@Test
+	void testStringFluxCollectListFlatMapMany() {
+		Flux<String> fluxString = Flux.just("A", "B", "C");
+		StepVerifier.create(fluxString.collectList().flatMapMany((List<String> list) -> {
+			list.replaceAll((value) -> {
+				return value.toLowerCase();
+			});
+			return Mono.just(list); //Flux.just(list) works too
+		})).expectNext(Arrays.asList("a", "b", "c")).verifyComplete();
+	}
+
+	@Test
+	void testStringFluxFromIterable() {
+		Flux<String> fluxIterable = Flux.fromIterable(Arrays.asList("A", "B", "C"));
+		StepVerifier.create(fluxIterable).expectNext("A").expectNext("B").expectNext("C").verifyComplete();
+	}
+
+	@Test
 	void testIntFluxRange() {
 		StepVerifier.create(Flux.range(1, 5)).expectNext(1).expectNext(2).expectNextCount(3).verifyComplete();
 	}
